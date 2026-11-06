@@ -15,6 +15,8 @@ pub(super) fn table() -> &'static HashMap<&'static str, &'static str> {
 
 #[rustfmt::skip]
 const TRANSLATIONS: &[(&str, &str)] = &[
+    ("Dictation failed", "Échec de la dictée"),
+    ("Open your MacBook’s lid or connect an external microphone, then try again.", "Ouvrez le capot de votre MacBook ou branchez un microphone externe, puis réessayez."),
     ("Hex picks a fast model", "Hex choisit un modèle rapide"),
     ("Follow live transcript", "Suivre la transcription en direct"),
     ("More call apps", "Plus d'apps d'appel"),

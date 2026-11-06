@@ -259,6 +259,9 @@ MacBook lid closed (macOS)                            // built-in mic is off but
   ├── default or saved mic is built in -> first other real input stands in
   │     -> Settings: "… is off while the lid is closed, so Hex listens to …"
   ├── no other input -> "the built-in microphone is off while the lid is closed"
+  │     -> failed dictation: notice with that cause, open-lid/external-mic guidance,
+  │        Settings and Close; does not activate Hex until Settings is clicked
+  │        (see [Dictation feedback](dictation.md#feedback))
   └── lid opens or closes -> re-resolve like a device-list change // IOKit clamshell notification
         -> switch once capture is idle
 Bluetooth default input (macOS, avoid_bluetooth_microphone on) // transport type, read per resolve

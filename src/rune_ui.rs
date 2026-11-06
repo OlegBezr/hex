@@ -15,6 +15,8 @@ pub(crate) mod capture_capsule;
 mod controls;
 #[cfg(target_os = "macos")]
 pub(crate) mod deep_link;
+#[cfg(any(target_os = "macos", test))]
+pub(crate) mod dictation_failure;
 mod explainer;
 mod found;
 mod found_choice;

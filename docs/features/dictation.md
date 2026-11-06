@@ -1285,6 +1285,10 @@ Record -> Release -> Transcribing/processing/paste -> Finished // dictate.feedba
      -> Stop tone still waiting on Lower audio -> Stop only, never done first
      -> Empty, failed, cancelled, Paste Last, programmatic -> No done tone
   Failure -> Error tone; wake/sleep keep macOS Pop/Tink      // dictate.error-tone
+     -> macOS: non-activating notice shows the actual cause, even with Settings closed
+        -> Closed lid: open the lid or connect an external microphone
+        -> Settings opens General; Close dismisses; next attempt or 12 s hides it
+        -> One notice, replaced on another failure; no replay of failures from before launch
      -> Classic has none: macOS Basso, Signature's error on Windows and Linux
      -> A lost microphone or input -> No tone; the capture ends
   Tone requested -> Playback worker opens the default output, then plays
@@ -1296,6 +1300,27 @@ Record -> Release -> Transcribing/processing/paste -> Finished // dictate.feedba
   Cold audio stack exceeds preload admission -> Warn once; recognition continues
      -> Loader keeps running; later tones play once the output opens
 ```
+
+The macOS notice is installed in `macos_rune` and polled by its main-thread
+pump, including while Settings is hidden. `rune_ui/dictation_failure` reads
+fresh dictation outcomes from the existing event log; the HUD and error tones
+keep their existing behavior. `microphone_failure_reaches_the_notice_with_its_explanation`,
+`old_failures_are_not_replayed_on_launch`,
+`retry_clears_the_notice_and_a_new_failure_gets_its_own_timeout`, and
+`a_completed_retry_in_the_same_batch_does_not_show_an_old_failure` exercise
+that feed over real event-log writes. Layout checks cover the cause, recovery,
+and actions; `notice_goldens` covers light/dark closed-lid and paste failures.
+**Observed November 6, 2026:** six focused macOS tests and 24 translation
+checks passed, as did strict app Clippy. Seven focused Linux tests passed,
+including generation of four reviewed light/dark notice goldens. The full Linux
+Rune UI group then passed 494 tests (three ignored), including comparison
+against the new goldens without updating them. An isolated
+macOS source build with its main window hidden showed the 480×244 notice
+after a synthetic failure was appended to its event log; CoreGraphics reported
+the panel on screen and the foreground application remained unchanged. The
+test instance was quit afterwards. This does not establish native VoiceOver
+announcements or recovery with a physical microphone. Native screenshot capture
+was unavailable; visual review used offscreen renders of the same view.
 
 **Fixed November 1, 2026 (issue 873):** on macOS the HUD remembered its last
 placement and skipped sending it to Rune again when it matched, so a HUD Rune
