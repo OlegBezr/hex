@@ -1310,7 +1310,17 @@ keep their existing behavior. `microphone_failure_reaches_the_notice_with_its_ex
 `a_completed_retry_in_the_same_batch_does_not_show_an_old_failure` exercise
 that feed over real event-log writes. Layout checks cover the cause, recovery,
 and actions; `notice_goldens` covers light/dark closed-lid and paste failures.
-These checks do not establish native focus preservation or microphone recovery.
+**Observed November 6, 2026:** six focused macOS tests and 24 translation
+checks passed, as did strict app Clippy. Seven focused Linux tests passed,
+including generation of four reviewed light/dark notice goldens. The full Linux
+Rune UI group then passed 494 tests (three ignored), including comparison
+against the new goldens without updating them. An isolated
+macOS source build with its main window hidden showed the 480×244 notice
+after a synthetic failure was appended to its event log; CoreGraphics reported
+the panel on screen and the foreground application remained unchanged. The
+test instance was quit afterwards. This does not establish native VoiceOver
+announcements or recovery with a physical microphone. Native screenshot capture
+was unavailable; visual review used offscreen renders of the same view.
 
 **Fixed November 1, 2026 (issue 873):** on macOS the HUD remembered its last
 placement and skipped sending it to Rune again when it matched, so a HUD Rune

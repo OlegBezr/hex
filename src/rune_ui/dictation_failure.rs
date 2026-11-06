@@ -40,6 +40,7 @@ impl Card {
 pub(crate) struct Notice {
     feed: Feed,
     panel: OverlayHandle<Card>,
+    poll_at: Instant,
 }
 
 #[cfg(target_os = "macos")]
@@ -73,12 +74,21 @@ impl Notice {
         panel.set_input(OverlayInput::Regions);
         let hide = panel.clone();
         panel.update(move |card, _| card.hide = Some(Arc::new(move || hide.hide())));
-        Ok(Self { feed, panel })
+        Ok(Self {
+            feed,
+            panel,
+            poll_at: Instant::now(),
+        })
     }
 
     /// Called by the macOS pump even when the main window is hidden.
     pub(crate) fn poll(&mut self) {
-        match self.feed.poll(Instant::now()) {
+        let now = Instant::now();
+        if now < self.poll_at {
+            return;
+        }
+        self.poll_at = now + Duration::from_millis(250);
+        match self.feed.poll(now) {
             Some(Change::Show(message)) => {
                 let panel = self.panel.clone();
                 self.panel.update(move |card, tx| {
@@ -200,6 +210,7 @@ fn view(card: &Card, cx: &mut Cx<Card>) -> El {
         .child(
             col()
                 .key("dictation-failure")
+                .role("alert")
                 .w_full()
                 .padding(16.0)
                 .gap(12.0)
