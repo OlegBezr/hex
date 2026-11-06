@@ -528,6 +528,11 @@ pub fn run(shutdown: &'static AtomicBool, listener: ListenerConfig, hidden: bool
             },
         )
     };
+    let notice_window = window.clone();
+    let dictation_failure =
+        crate::rune_ui::dictation_failure::Notice::install(&mut app, move || {
+            show(&notice_window, Destination::Settings);
+        })?;
     let hud = crate::rune_hud::install(&mut app);
     crate::rune_ui::live_text::install(&mut app, crate::rune_hud::live_text_place);
     // The capture capsule, picker, and ink.
@@ -564,6 +569,7 @@ pub fn run(shutdown: &'static AtomicBool, listener: ListenerConfig, hidden: bool
         runtime: handle,
         shutdown,
         indicator_events,
+        dictation_failure,
         hud,
         status_actions: None,
         controller_events,
@@ -884,6 +890,7 @@ struct Pump {
     runtime: RuntimeHandle,
     shutdown: &'static AtomicBool,
     indicator_events: Receiver<DictationIndicatorEvent>,
+    dictation_failure: crate::rune_ui::dictation_failure::Notice,
     hud: crate::rune_hud::HudSender,
     status_actions: Option<Receiver<StatusItemAction>>,
     controller_events: Receiver<ControllerEvent>,
@@ -1075,6 +1082,7 @@ impl Pump {
         while let Ok(event) = self.indicator_events.try_recv() {
             indicator.handle(event);
         }
+        self.dictation_failure.poll();
         indicator.follow_pointer();
         while let Ok(call) = self.developer_calls.try_recv() {
             let reply = self.developer(call.command, indicator);

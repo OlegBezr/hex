@@ -971,7 +971,7 @@ struct Route {
     avoid_bluetooth: bool,
 }
 
-const LID_CLOSED_ERROR: &str = "the built-in microphone is off while the lid is closed";
+pub(crate) const LID_CLOSED_ERROR: &str = "the built-in microphone is off while the lid is closed";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct InputPlan {
